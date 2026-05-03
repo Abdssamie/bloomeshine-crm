@@ -1,4 +1,4 @@
 import { NavigationMenuItemType, defineNavigationMenuItem } from 'twenty-sdk/define';
-import { NAV, VIEW } from 'src/constants/universal-identifiers';
+import { NAV } from 'src/constants/universal-identifiers';
 
-export default defineNavigationMenuItem({ universalIdentifier: NAV.documents, type: NavigationMenuItemType.VIEW, name: 'Documents', viewUniversalIdentifier: VIEW.documents, position: 130 });
+export default defineNavigationMenuItem({ universalIdentifier: NAV.documents, type: NavigationMenuItemType.LINK, name: 'Documents', icon: 'IconFiles', link: '/objects/documents', position: 130 });

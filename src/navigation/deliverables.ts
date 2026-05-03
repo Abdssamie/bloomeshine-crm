@@ -1,4 +1,4 @@
 import { NavigationMenuItemType, defineNavigationMenuItem } from 'twenty-sdk/define';
-import { NAV, VIEW } from 'src/constants/universal-identifiers';
+import { NAV } from 'src/constants/universal-identifiers';
 
-export default defineNavigationMenuItem({ universalIdentifier: NAV.deliverables, type: NavigationMenuItemType.VIEW, name: 'Deliverables', viewUniversalIdentifier: VIEW.deliverables, position: 100 });
+export default defineNavigationMenuItem({ universalIdentifier: NAV.deliverables, type: NavigationMenuItemType.LINK, name: 'Deliverables', icon: 'IconChecklist', link: '/objects/deliverables', position: 100 });
