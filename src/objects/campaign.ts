@@ -14,7 +14,7 @@ export default defineObject({
   isSearchable: true,
   labelIdentifierFieldMetadataUniversalIdentifier: fieldId(OBJECT.campaign, 'title'),
   fields: [
-    { universalIdentifier: fieldId(OBJECT.campaign, 'title'), type: FieldType.TEXT, name: 'title', label: 'Title', isNullable: false },
+    { universalIdentifier: fieldId(OBJECT.campaign, 'title'), type: FieldType.TEXT, name: 'title', label: 'Title', isNullable: true },
     { universalIdentifier: fieldId(OBJECT.campaign, 'objective'), type: FieldType.RICH_TEXT, name: 'objective', label: 'Objective', isNullable: true },
     { universalIdentifier: fieldId(OBJECT.campaign, 'briefUrl'), type: FieldType.LINKS, name: 'briefUrl', label: 'Brief URL', isNullable: true },
     { universalIdentifier: fieldId(OBJECT.campaign, 'portalSlug'), type: FieldType.TEXT, name: 'portalSlug', label: 'Shortlist Portal Slug', isNullable: true },
@@ -27,7 +27,7 @@ export default defineObject({
       type: FieldType.SELECT,
       name: 'status',
       label: 'Status',
-      isNullable: false,
+      isNullable: true,
       defaultValue: "'DRAFTING'",
       options: select(['Drafting', 'Active', 'Completed', 'On-Hold']),
     },
