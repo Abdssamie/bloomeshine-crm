@@ -23,7 +23,7 @@ export default defineObject({
   isSearchable: true,
   labelIdentifierFieldMetadataUniversalIdentifier: fieldId(OBJECT.creator, 'displayName'),
   fields: [
-    { universalIdentifier: fieldId(OBJECT.creator, 'displayName'), type: FieldType.TEXT, name: 'displayName', label: 'Display Name', isNullable: true },
+    { universalIdentifier: fieldId(OBJECT.creator, 'displayName'), type: FieldType.TEXT, name: 'displayName', label: 'Display Name', isNullable: true, defaultValue: "''" },
     { universalIdentifier: fieldId(OBJECT.creator, 'legalName'), type: FieldType.TEXT, name: 'legalName', label: 'Legal Name', isNullable: true },
     { universalIdentifier: fieldId(OBJECT.creator, 'contactEmail'), type: FieldType.EMAILS, name: 'contactEmail', label: 'Business Email', isNullable: true },
     { universalIdentifier: fieldId(OBJECT.creator, 'profileUrl'), type: FieldType.LINKS, name: 'profileUrl', label: 'Profile URL', isNullable: true },

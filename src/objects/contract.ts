@@ -14,7 +14,7 @@ export default defineObject({
   isSearchable: true,
   labelIdentifierFieldMetadataUniversalIdentifier: fieldId(OBJECT.contract, 'title'),
   fields: [
-    { universalIdentifier: fieldId(OBJECT.contract, 'title'), type: FieldType.TEXT, name: 'title', label: 'Title', isNullable: true },
+    { universalIdentifier: fieldId(OBJECT.contract, 'title'), type: FieldType.TEXT, name: 'title', label: 'Title', isNullable: true, defaultValue: "''" },
     { universalIdentifier: fieldId(OBJECT.contract, 'contractType'), type: FieldType.SELECT, name: 'contractType', label: 'Type', isNullable: true, defaultValue: "'LIGHT_AGREEMENT'", options: select(['Light-Agreement', 'NDA', 'Three-Party']) },
     { universalIdentifier: fieldId(OBJECT.contract, 'status'), type: FieldType.SELECT, name: 'status', label: 'Status', isNullable: true, defaultValue: "'DRAFT'", options: select(['Draft', 'Sent', 'Signed']) },
     { universalIdentifier: fieldId(OBJECT.contract, 'sentAt'), type: FieldType.DATE_TIME, name: 'sentAt', label: 'Sent At', isNullable: true },

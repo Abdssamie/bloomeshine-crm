@@ -14,7 +14,7 @@ export default defineObject({
   isSearchable: true,
   labelIdentifierFieldMetadataUniversalIdentifier: fieldId(OBJECT.document, 'fileName'),
   fields: [
-    { universalIdentifier: fieldId(OBJECT.document, 'fileName'), type: FieldType.TEXT, name: 'fileName', label: 'File Name', isNullable: true },
+    { universalIdentifier: fieldId(OBJECT.document, 'fileName'), type: FieldType.TEXT, name: 'fileName', label: 'File Name', isNullable: true, defaultValue: "''" },
     { universalIdentifier: fieldId(OBJECT.document, 'fileUrl'), type: FieldType.LINKS, name: 'fileUrl', label: 'File URL', isNullable: true },
     { universalIdentifier: fieldId(OBJECT.document, 'fileType'), type: FieldType.TEXT, name: 'fileType', label: 'File Type', isNullable: true },
     { universalIdentifier: fieldId(OBJECT.document, 'fileSize'), type: FieldType.NUMBER, name: 'fileSize', label: 'File Size', isNullable: true, universalSettings: { dataType: NumberDataType.INT } },

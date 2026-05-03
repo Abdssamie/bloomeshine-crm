@@ -14,7 +14,7 @@ export default defineObject({
   isSearchable: true,
   labelIdentifierFieldMetadataUniversalIdentifier: fieldId(OBJECT.deliverable, 'name'),
   fields: [
-    { universalIdentifier: fieldId(OBJECT.deliverable, 'name'), type: FieldType.TEXT, name: 'name', label: 'Name', isNullable: true },
+    { universalIdentifier: fieldId(OBJECT.deliverable, 'name'), type: FieldType.TEXT, name: 'name', label: 'Name', isNullable: true, defaultValue: "''" },
     { universalIdentifier: fieldId(OBJECT.deliverable, 'platform'), type: FieldType.TEXT, name: 'platform', label: 'Platform', isNullable: true },
     { universalIdentifier: fieldId(OBJECT.deliverable, 'contentType'), type: FieldType.TEXT, name: 'contentType', label: 'Content Type', isNullable: true },
     { universalIdentifier: fieldId(OBJECT.deliverable, 'draftUrl'), type: FieldType.LINKS, name: 'draftUrl', label: 'Draft URL', isNullable: true },

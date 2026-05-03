@@ -14,7 +14,7 @@ export default defineObject({
   isSearchable: true,
   labelIdentifierFieldMetadataUniversalIdentifier: fieldId(OBJECT.invoice, 'invoiceNumber'),
   fields: [
-    { universalIdentifier: fieldId(OBJECT.invoice, 'invoiceNumber'), type: FieldType.TEXT, name: 'invoiceNumber', label: 'Invoice Number', isNullable: true },
+    { universalIdentifier: fieldId(OBJECT.invoice, 'invoiceNumber'), type: FieldType.TEXT, name: 'invoiceNumber', label: 'Invoice Number', isNullable: true, defaultValue: "''" },
     { universalIdentifier: fieldId(OBJECT.invoice, 'title'), type: FieldType.TEXT, name: 'title', label: 'Title', isNullable: true },
     { universalIdentifier: fieldId(OBJECT.invoice, 'invoiceType'), type: FieldType.SELECT, name: 'invoiceType', label: 'Type', isNullable: true, defaultValue: "'INBOUND'", options: select(['Inbound', 'Outbound']) },
     { universalIdentifier: fieldId(OBJECT.invoice, 'status'), type: FieldType.SELECT, name: 'status', label: 'Status', isNullable: true, defaultValue: "'DRAFT'", options: select(['Draft', 'Sent', 'Paid', 'Overdue', 'Cancelled']) },

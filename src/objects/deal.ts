@@ -23,7 +23,7 @@ export default defineObject({
   isSearchable: true,
   labelIdentifierFieldMetadataUniversalIdentifier: fieldId(OBJECT.deal, 'name'),
   fields: [
-    { universalIdentifier: fieldId(OBJECT.deal, 'name'), type: FieldType.TEXT, name: 'name', label: 'Deal Name', isNullable: true },
+    { universalIdentifier: fieldId(OBJECT.deal, 'name'), type: FieldType.TEXT, name: 'name', label: 'Deal Name', isNullable: true, defaultValue: "''" },
     money('brandPrice', 'Brand Price'),
     money('creatorPayout', 'Creator Payout'),
     money('agencyMargin', 'Agency Margin'),

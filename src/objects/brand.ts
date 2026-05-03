@@ -14,7 +14,7 @@ export default defineObject({
   isSearchable: true,
   labelIdentifierFieldMetadataUniversalIdentifier: fieldId(OBJECT.brand, 'name'),
   fields: [
-    { universalIdentifier: fieldId(OBJECT.brand, 'name'), type: FieldType.TEXT, name: 'name', label: 'Brand Name', isNullable: true },
+    { universalIdentifier: fieldId(OBJECT.brand, 'name'), type: FieldType.TEXT, name: 'name', label: 'Brand Name', isNullable: true, defaultValue: "''" },
     { universalIdentifier: fieldId(OBJECT.brand, 'website'), type: FieldType.LINKS, name: 'website', label: 'Website', isNullable: true },
     { universalIdentifier: fieldId(OBJECT.brand, 'industry'), type: FieldType.TEXT, name: 'industry', label: 'Industry', isNullable: true },
     { universalIdentifier: fieldId(OBJECT.brand, 'subNiche'), type: FieldType.TEXT, name: 'subNiche', label: 'Sub-niche', isNullable: true },
