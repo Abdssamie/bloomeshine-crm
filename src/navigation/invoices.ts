@@ -1,4 +1,4 @@
 import { NavigationMenuItemType, defineNavigationMenuItem } from 'twenty-sdk/define';
-import { NAV } from 'src/constants/universal-identifiers';
+import { NAV, VIEW } from 'src/constants/universal-identifiers';
 
-export default defineNavigationMenuItem({ universalIdentifier: NAV.invoices, type: NavigationMenuItemType.LINK, name: 'Invoices', icon: 'IconReceipt2', link: '/objects/invoices', position: 120 });
+export default defineNavigationMenuItem({ universalIdentifier: NAV.invoices, type: NavigationMenuItemType.VIEW, name: 'Invoices', viewUniversalIdentifier: VIEW.invoices, position: 120 });
