@@ -27,7 +27,6 @@ export const VIEW = {
 } as const;
 
 export const NAV = {
-  folder: '40fd93af-efa9-42a6-9904-b043bd4849fa',
   brands: '6f39cff2-7fe4-4bc2-9056-4016675a837b',
   creators: '571166ae-2080-43f4-99d5-659b0ea5cc05',
   campaigns: '0ad00740-2fdd-41c5-b18b-212c647f10ff',

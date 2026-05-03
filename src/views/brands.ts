@@ -9,5 +9,10 @@ export default defineView({
   position: 10,
   visibility: ViewVisibility.WORKSPACE,
   openRecordIn: ViewOpenRecordIn.SIDE_PANEL,
-  fields: [{ universalIdentifier: generateDefaultFieldUniversalIdentifier({ objectUniversalIdentifier: VIEW.brands, fieldName: 'primary' }), fieldMetadataUniversalIdentifier: generateDefaultFieldUniversalIdentifier({ objectUniversalIdentifier: OBJECT.brand, fieldName: 'name' }), position: 0, isVisible: true }],
+  fields: [
+    { universalIdentifier: generateDefaultFieldUniversalIdentifier({ objectUniversalIdentifier: VIEW.brands, fieldName: 'primary' }), fieldMetadataUniversalIdentifier: generateDefaultFieldUniversalIdentifier({ objectUniversalIdentifier: OBJECT.brand, fieldName: 'name' }), position: 0, isVisible: true },
+    { universalIdentifier: generateDefaultFieldUniversalIdentifier({ objectUniversalIdentifier: VIEW.brands, fieldName: 'status' }), fieldMetadataUniversalIdentifier: generateDefaultFieldUniversalIdentifier({ objectUniversalIdentifier: OBJECT.brand, fieldName: 'status' }), position: 1, isVisible: true },
+    { universalIdentifier: generateDefaultFieldUniversalIdentifier({ objectUniversalIdentifier: VIEW.brands, fieldName: 'contactEmail' }), fieldMetadataUniversalIdentifier: generateDefaultFieldUniversalIdentifier({ objectUniversalIdentifier: OBJECT.brand, fieldName: 'contactEmail' }), position: 2, isVisible: true },
+    { universalIdentifier: generateDefaultFieldUniversalIdentifier({ objectUniversalIdentifier: VIEW.brands, fieldName: 'website' }), fieldMetadataUniversalIdentifier: generateDefaultFieldUniversalIdentifier({ objectUniversalIdentifier: OBJECT.brand, fieldName: 'website' }), position: 3, isVisible: true },
+  ],
 });
