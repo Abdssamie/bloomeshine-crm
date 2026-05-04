@@ -33,26 +33,29 @@ export const manyToOne = ({
   universalIdentifier,
   name,
   label,
+  icon,
   targetObject,
   targetField,
 }: {
   universalIdentifier: string;
   name: string;
   label: string;
+  icon?: string;
   targetObject: string;
   targetField: string;
 }) => ({
   universalIdentifier,
-  type: FieldType.RELATION,
+  type: FieldType.RELATION as const,
   name,
   label,
+  icon,
   isNullable: true,
   relationTargetObjectMetadataUniversalIdentifier: targetObject,
   relationTargetFieldMetadataUniversalIdentifier: targetField,
   universalSettings: {
     relationType: RelationType.MANY_TO_ONE,
     onDelete: OnDeleteAction.SET_NULL,
-    joinColumnName: `${name}Id`,
+      joinColumnName: `${name}Id`,
   },
 });
 
@@ -60,19 +63,22 @@ export const oneToMany = ({
   universalIdentifier,
   name,
   label,
+  icon,
   targetObject,
   targetField,
 }: {
   universalIdentifier: string;
   name: string;
   label: string;
+  icon?: string;
   targetObject: string;
   targetField: string;
 }) => ({
   universalIdentifier,
-  type: FieldType.RELATION,
+  type: FieldType.RELATION as const,
   name,
   label,
+  icon,
   isNullable: true,
   relationTargetObjectMetadataUniversalIdentifier: targetObject,
   relationTargetFieldMetadataUniversalIdentifier: targetField,
