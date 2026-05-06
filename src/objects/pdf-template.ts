@@ -1,0 +1,98 @@
+import { FieldType, defineObject } from 'twenty-sdk/define';
+
+import { OBJECT } from 'src/constants/universal-identifiers';
+import { fieldId, select } from 'src/objects/_helpers';
+
+export default defineObject({
+  universalIdentifier: OBJECT.pdfTemplate,
+  nameSingular: 'pdfTemplate',
+  namePlural: 'pdfTemplates',
+  labelSingular: 'PDF Template',
+  labelPlural: 'PDF Templates',
+  description: 'Editable HTML templates used by Gotenberg for invoices and contracts.',
+  icon: 'IconFileTypePdf',
+  isSearchable: true,
+  labelIdentifierFieldMetadataUniversalIdentifier: fieldId(
+    OBJECT.pdfTemplate,
+    'name',
+  ),
+  fields: [
+    {
+      universalIdentifier: fieldId(OBJECT.pdfTemplate, 'name'),
+      type: FieldType.TEXT,
+      name: 'name',
+      label: 'Name',
+      icon: 'IconFileTypePdf',
+      isNullable: true,
+      defaultValue: "''",
+    },
+    {
+      universalIdentifier: fieldId(OBJECT.pdfTemplate, 'kind'),
+      type: FieldType.SELECT,
+      name: 'kind',
+      label: 'Kind',
+      icon: 'IconCategory',
+      isNullable: true,
+      defaultValue: "'INVOICE'",
+      options: select(['Invoice', 'Contract']),
+    },
+    {
+      universalIdentifier: fieldId(OBJECT.pdfTemplate, 'isActive'),
+      type: FieldType.BOOLEAN,
+      name: 'isActive',
+      label: 'Active',
+      icon: 'IconCircleCheck',
+      isNullable: true,
+      defaultValue: false,
+    },
+    {
+      universalIdentifier: fieldId(OBJECT.pdfTemplate, 'htmlSource'),
+      type: FieldType.TEXT,
+      name: 'htmlSource',
+      label: 'HTML Source',
+      icon: 'IconCode',
+      isNullable: true,
+    },
+    {
+      universalIdentifier: fieldId(OBJECT.pdfTemplate, 'cssSource'),
+      type: FieldType.TEXT,
+      name: 'cssSource',
+      label: 'CSS Source',
+      icon: 'IconPalette',
+      isNullable: true,
+    },
+    {
+      universalIdentifier: fieldId(OBJECT.pdfTemplate, 'previewFile'),
+      type: FieldType.FILES,
+      name: 'previewFile',
+      label: 'Preview',
+      icon: 'IconFileTypePdf',
+      isNullable: true,
+      universalSettings: { maxNumberOfValues: 1 },
+    },
+    {
+      universalIdentifier: fieldId(OBJECT.pdfTemplate, 'previewUrl'),
+      type: FieldType.LINKS,
+      name: 'previewUrl',
+      label: 'Preview URL',
+      icon: 'IconExternalLink',
+      isNullable: true,
+    },
+    {
+      universalIdentifier: fieldId(OBJECT.pdfTemplate, 'lastPreviewedAt'),
+      type: FieldType.DATE_TIME,
+      name: 'lastPreviewedAt',
+      label: 'Previewed',
+      icon: 'IconClock',
+      isNullable: true,
+    },
+    {
+      universalIdentifier: fieldId(OBJECT.pdfTemplate, 'notes'),
+      type: FieldType.RICH_TEXT,
+      name: 'notes',
+      label: 'Notes',
+      icon: 'IconNotes',
+      isNullable: true,
+    },
+  ],
+});

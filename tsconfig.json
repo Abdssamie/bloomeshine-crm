@@ -6,7 +6,7 @@
     "outDir": "./dist",
     "rootDir": ".",
     "jsx": "react-jsx",
-    "moduleResolution": "node",
+    "moduleResolution": "nodenext",
     "allowSyntheticDefaultImports": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -17,7 +17,7 @@
     "noImplicitAny": true,
     "strictBindCallApply": false,
     "target": "es2018",
-    "module": "esnext",
+    "module": "NodeNext",
     "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
@@ -27,16 +27,9 @@
       "~/*": ["./*"]
     }
   },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "vitest.config.ts"],
   "exclude": [
     "node_modules",
-    "dist",
-    "**/*.test.ts",
-    "**/*.spec.ts",
-    "**/*.integration-test.ts"
-  ],
-  "references": [
-    {
-      "path": "./tsconfig.spec.json"
-    }
+    "dist"
   ]
 }
