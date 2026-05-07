@@ -27,6 +27,7 @@
     "github:sync-secrets": "node scripts/sync-github-secrets.mjs",
     "act:pdf": "act workflow_dispatch -W .github/workflows/pdf-editor-cd.yml -P ubuntu-latest=-self-hosted --env-file .env --secret-file .env",
     "act:cd": "act push -W .github/workflows/cd.yml -P ubuntu-latest=-self-hosted --env-file .env --secret-file .env",
+    "twenty:typecheck": "yarn twenty typecheck",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
