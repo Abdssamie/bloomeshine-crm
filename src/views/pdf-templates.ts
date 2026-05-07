@@ -28,7 +28,7 @@ export default defineView({
   type: ViewType.TABLE,
   position: 70,
   visibility: ViewVisibility.WORKSPACE,
-  openRecordIn: ViewOpenRecordIn.SIDE_PANEL,
+  openRecordIn: ViewOpenRecordIn.RECORD_PAGE,
   fields: [
     viewField("name", 0),
     viewField("kind", 1),
