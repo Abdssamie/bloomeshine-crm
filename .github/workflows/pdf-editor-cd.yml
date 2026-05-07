@@ -38,7 +38,12 @@ jobs:
         run: yarn install --immutable
 
       - name: Build PDF editor
-        run: yarn pdf:build
+        run: |
+          yarn twenty dev --once
+          yarn pdf:build
+        env:
+          TWENTY_API_URL: ${{ vars.TWENTY_API_URL }}
+          TWENTY_API_KEY: ${{ secrets.TWENTY_API_KEY }}
 
       - name: Upload secrets to Cloudflare
         run: |

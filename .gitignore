@@ -25,6 +25,7 @@ apps/*/.wrangler/
 # misc
 .DS_Store
 *.pem
+worker-bundle.js
 
 # debug
 npm-debug.log*
