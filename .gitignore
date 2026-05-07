@@ -39,3 +39,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 *.d.ts
+!apps/pdf-editor/src/vite-env.d.ts

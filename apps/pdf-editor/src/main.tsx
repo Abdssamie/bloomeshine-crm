@@ -8,6 +8,7 @@ import {
   createRootRoute,
   createRoute,
   createRouter,
+  useParams
 } from '@tanstack/react-router';
 
 import './styles/app.css';
@@ -111,6 +112,15 @@ const placeholders = [
   '{{text.deliverables}}',
   '{{text.usageRights}}',
 ];
+
+type PdfTemplate = {
+  id: string;
+  name?: string | null;
+  kind?: 'INVOICE' | 'CONTRACT' | null;
+  isActive?: boolean | null;
+  htmlSource?: string | null;
+  cssSource?: string | null;
+};
 
 const escapeSource = (value: string) =>
   value
@@ -217,62 +227,225 @@ const Root = () => (
   </>
 );
 
-const EditorPage = () => {
-  const [title, setTitle] = useStoredState('ima-pdf-title', 'Default Contract');
-  const [html, setHtml] = useStoredState('ima-pdf-html', defaultHtml);
-  const [css, setCss] = useStoredState('ima-pdf-css', defaultCss);
-  const [activeEditorTab, setActiveEditorTab] = React.useState<'html' | 'css'>(
-    'html',
+const TemplatesPage = () => {
+  const [templates, setTemplates] = React.useState<PdfTemplate[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    fetch('/api/templates')
+      .then((res) => res.json() as Promise<{ templates?: PdfTemplate[]; error?: string }>)
+      .then((payload) => {
+        if (payload.error) throw new Error(payload.error);
+        setTemplates(payload.templates ?? []);
+      })
+      .catch((e) => setError(e.message))
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  return (
+    <main className="app-shell help-page">
+      <header className="topbar">
+        <div>
+          <p className="kicker">CRM PDF Templates</p>
+          <h1>Select a Template</h1>
+        </div>
+        <Link to="/help" className="secondary-button">
+          Help
+        </Link>
+      </header>
+      {error && <div className="error-banner" style={{marginTop: 16}}>{error}</div>}
+      {isLoading ? (
+        <p style={{marginTop: 16}}>Loading templates...</p>
+      ) : (
+        <div className="template-list" style={{ marginTop: 24, display: 'grid', gap: 16, gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
+          {templates.map(t => (
+            <Link key={t.id} to="/editor/$templateId" params={{ templateId: t.id }} style={{ textDecoration: 'none' }}>
+              <div className="setup-grid article" style={{ background: '#fffaf1', border: '1px solid #d5cbbb', borderRadius: 8, padding: 16, color: '#3a352d', height: '100%' }}>
+                <h3 style={{ margin: '0 0 8px', fontSize: 18 }}>{t.name || 'Unnamed Template'}</h3>
+                <p style={{ margin: 0, fontSize: 13, color: '#6f675a' }}>
+                  {t.kind} {t.isActive ? '• Active' : ''}
+                </p>
+              </div>
+            </Link>
+          ))}
+          {templates.length === 0 && <p>No templates found.</p>}
+        </div>
+      )}
+    </main>
   );
+};
+
+const EditorPage = () => {
+  const { templateId } = useParams({ strict: false });
+  const [title, setTitle] = React.useState('Default Contract');
+  const [kind, setKind] = React.useState<'INVOICE' | 'CONTRACT'>('CONTRACT');
+  const [isActive, setIsActive] = React.useState(false);
+  const [html, setHtml] = React.useState(defaultHtml);
+  const [css, setCss] = React.useState(defaultCss);
+  const [activeEditorTab, setActiveEditorTab] = React.useState<'html' | 'css'>('html');
   const [pdfUrl, setPdfUrl] = useStateWithCleanup<string | null>(null);
+  const [isLoadingTemplate, setIsLoadingTemplate] = useStoredFlag(false);
+  const [isSaving, setIsSaving] = useStoredFlag(false);
+  const [isDirty, setIsDirty] = React.useState(false);
   const [isRendering, setIsRendering] = useStoredFlag(false);
   const [error, setError] = useStoredFlag<string | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
+
+  const applyTemplate = React.useCallback(
+    (template: PdfTemplate) => {
+      setTitle(template.name ?? '');
+      setKind(template.kind === 'INVOICE' ? 'INVOICE' : 'CONTRACT');
+      setIsActive(Boolean(template.isActive));
+      setHtml(template.htmlSource ?? defaultHtml);
+      setCss(template.cssSource ?? defaultCss);
+      setIsDirty(false);
+      setPdfUrl(null);
+    },
+    [setPdfUrl],
+  );
+
+  const loadTemplate = async (id: string) => {
+    if (!id) return;
+    setIsLoadingTemplate(true);
+    setError(null);
+    try {
+      const response = await fetch(`/api/templates/${encodeURIComponent(id)}`);
+      const payload = (await response.json()) as { template?: PdfTemplate; error?: string };
+      if (!response.ok || !payload.template) {
+        throw new Error(payload.error ?? 'Failed to load PDF template.');
+      }
+      applyTemplate(payload.template);
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : 'Failed to load.');
+    } finally {
+      setIsLoadingTemplate(false);
+    }
+  };
+
+  React.useEffect(() => {
+    if (templateId) {
+      loadTemplate(templateId as string);
+    }
+  }, [templateId]);
+
+  const updateTitle = (value: string) => {
+    setTitle(value);
+    setIsDirty(true);
+  };
+
+  const updateHtml = (value: string) => {
+    setHtml(value);
+    setIsDirty(true);
+  };
+
+  const updateCss = (value: string) => {
+    setCss(value);
+    setIsDirty(true);
+  };
+
+  const save = async () => {
+    if (!templateId) return;
+    setIsSaving(true);
+    setError(null);
+    try {
+      const response = await fetch(`/api/templates/${encodeURIComponent(templateId as string)}`, {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ name: title, kind, isActive, htmlSource: html, cssSource: css }),
+      });
+      const payload = (await response.json()) as { template?: PdfTemplate; error?: string };
+      if (!response.ok || !payload.template) {
+        throw new Error(payload.error ?? 'Failed to save PDF template.');
+      }
+      applyTemplate(payload.template);
+    } catch (saveError) {
+      setError(saveError instanceof Error ? saveError.message : 'Failed to save.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const render = async () => {
     setIsRendering(true);
     setError(null);
-
     try {
       const response = await fetch('/api/render', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ title, html, css }),
       });
-
       if (!response.ok) {
         const payload = (await response.json().catch(() => null)) as {
           error?: string;
           details?: string;
         } | null;
-
-        throw new Error(
-          [payload?.error, payload?.details].filter(Boolean).join(' ') ||
-            'Render failed.',
-        );
+        throw new Error([payload?.error, payload?.details].filter(Boolean).join(' ') || 'Render failed.');
       }
-
       const blob = await response.blob();
       setPdfUrl(URL.createObjectURL(blob));
     } catch (renderError) {
-      setError(
-        renderError instanceof Error ? renderError.message : 'Render failed.',
-      );
+      setError(renderError instanceof Error ? renderError.message : 'Render failed.');
     } finally {
       setIsRendering(false);
     }
   };
 
   return (
-    <main className="app-shell">
+    <div className="editor-shell">
       {error ? <div className="error-banner">{error}</div> : null}
 
-      <section className="layout">
-        <section className="editor-panel">
-          <label className="field">
-            <span>Template name</span>
-            <input value={title} onChange={(event) => setTitle(event.target.value)} />
-          </label>
+      <header className="editor-topbar">
+        <Link to="/" className="back-link">
+          &larr; Back
+        </Link>
+        
+        <input
+          className="title-input"
+          value={title}
+          onChange={(event) => updateTitle(event.target.value)}
+          placeholder="Template name"
+        />
 
+        <select
+          className="minimal-select"
+          value={kind}
+          onChange={(event) => {
+            setKind(event.target.value === 'INVOICE' ? 'INVOICE' : 'CONTRACT');
+            setIsDirty(true);
+          }}
+        >
+          <option value="INVOICE">Invoice</option>
+          <option value="CONTRACT">Contract</option>
+        </select>
+
+        <label className="minimal-check">
+          <input
+            type="checkbox"
+            checked={isActive}
+            onChange={(event) => {
+              setIsActive(event.target.checked);
+              setIsDirty(true);
+            }}
+          />
+          <span>Active</span>
+        </label>
+
+        <div className="spacer" />
+
+        <button type="button" onClick={save} disabled={!templateId || isSaving || isLoadingTemplate || !isDirty} className="primary-button">
+          {isSaving ? 'Saving...' : 'Save to CRM'}
+        </button>
+        <button type="button" onClick={render} disabled={isRendering} className="primary-button">
+          {isRendering ? 'Rendering...' : 'Render PDF'}
+        </button>
+        <button type="button" onClick={() => setIsSidebarOpen(v => !v)} className="secondary-button toggle-sidebar-btn">
+          {isSidebarOpen ? 'Hide Placeholders' : 'Show Placeholders'}
+        </button>
+      </header>
+
+      <div className={`layout ${isSidebarOpen ? '' : 'sidebar-closed'}`}>
+        <section className="editor-panel">
           <div className="tabbed-editor">
             <div className="tab-list" role="tablist" aria-label="Template source">
               <button
@@ -297,45 +470,17 @@ const EditorPage = () => {
 
             {activeEditorTab === 'html' ? (
               <div className="code-field">
-                <HighlightedTextarea
-                  ariaLabel="HTML source"
-                  language="html"
-                  value={html}
-                  onChange={setHtml}
-                />
+                <HighlightedTextarea ariaLabel="HTML source" language="html" value={html} onChange={updateHtml} />
               </div>
             ) : (
               <div className="code-field">
-                <HighlightedTextarea
-                  ariaLabel="CSS source"
-                  language="css"
-                  value={css}
-                  onChange={setCss}
-                />
+                <HighlightedTextarea ariaLabel="CSS source" language="css" value={css} onChange={updateCss} />
               </div>
             )}
           </div>
         </section>
 
-        <aside className="preview-panel">
-          <div className="preview-header">
-            <div>
-              <p className="kicker">Preview</p>
-              <h2>Gotenberg output</h2>
-            </div>
-            {pdfUrl ? (
-              <a href={pdfUrl} download={`${title || 'template'}.pdf`}>
-                Download
-              </a>
-            ) : null}
-            <Link to="/help" className="secondary-button">
-              Setup
-            </Link>
-            <button onClick={render} disabled={isRendering}>
-              {isRendering ? 'Rendering' : 'Render PDF'}
-            </button>
-          </div>
-
+        <section className="preview-panel">
           <div className="pdf-frame">
             {pdfUrl ? (
               <iframe title="PDF preview" src={pdfUrl} />
@@ -345,8 +490,10 @@ const EditorPage = () => {
               </div>
             )}
           </div>
+        </section>
 
-          <div className="placeholder-card">
+        <aside className="sidebar-panel">
+          <div className="sidebar-inner">
             <p className="kicker">Placeholders</p>
             <div className="placeholder-list">
               {placeholders.map((placeholder) => (
@@ -355,8 +502,8 @@ const EditorPage = () => {
             </div>
           </div>
         </aside>
-      </section>
-    </main>
+      </div>
+    </div>
   );
 };
 
@@ -368,7 +515,7 @@ const HelpPage = () => (
         <h1>Cloudflare Worker Setup</h1>
       </div>
       <Link to="/" className="secondary-button">
-        Editor
+        Templates
       </Link>
     </header>
 
@@ -400,6 +547,11 @@ const rootRoute = createRootRoute({ component: Root });
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
+  component: TemplatesPage,
+});
+const editorRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/editor/$templateId',
   component: EditorPage,
 });
 const helpRoute = createRoute({
@@ -409,7 +561,7 @@ const helpRoute = createRoute({
 });
 
 const router = createRouter({
-  routeTree: rootRoute.addChildren([indexRoute, helpRoute]),
+  routeTree: rootRoute.addChildren([indexRoute, editorRoute, helpRoute]),
 });
 
 declare module '@tanstack/react-router' {

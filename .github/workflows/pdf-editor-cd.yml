@@ -40,17 +40,23 @@ jobs:
       - name: Build PDF editor
         run: yarn pdf:build
 
-      - name: Upload Gotenberg auth secrets to Cloudflare
+      - name: Upload secrets to Cloudflare
         run: |
           test -n "$GOTENBERG_API_BASIC_AUTH_USERNAME"
           test -n "$GOTENBERG_API_BASIC_AUTH_PASSWORD"
+          test -n "$TWENTY_API_URL"
+          test -n "$TWENTY_API_KEY"
           printf '%s' "$GOTENBERG_API_BASIC_AUTH_USERNAME" | yarn workspace ima-pdf-editor wrangler secret put GOTENBERG_API_BASIC_AUTH_USERNAME
           printf '%s' "$GOTENBERG_API_BASIC_AUTH_PASSWORD" | yarn workspace ima-pdf-editor wrangler secret put GOTENBERG_API_BASIC_AUTH_PASSWORD
+          printf '%s' "$TWENTY_API_URL" | yarn workspace ima-pdf-editor wrangler secret put TWENTY_API_URL
+          printf '%s' "$TWENTY_API_KEY" | yarn workspace ima-pdf-editor wrangler secret put TWENTY_API_KEY
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           GOTENBERG_API_BASIC_AUTH_USERNAME: ${{ secrets.GOTENBERG_API_BASIC_AUTH_USERNAME }}
           GOTENBERG_API_BASIC_AUTH_PASSWORD: ${{ secrets.GOTENBERG_API_BASIC_AUTH_PASSWORD }}
+          TWENTY_API_URL: ${{ secrets.TWENTY_API_URL }}
+          TWENTY_API_KEY: ${{ secrets.TWENTY_API_KEY }}
 
       - name: Deploy to Cloudflare Workers
         run: yarn workspace ima-pdf-editor wrangler deploy
