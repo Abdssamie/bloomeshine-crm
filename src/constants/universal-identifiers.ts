@@ -22,13 +22,8 @@ export const VIEW = {
   pdfTemplates: '943cce61-7132-4613-afaa-6384e5e954f2',
 } as const;
 
-export const FRONT_COMPONENT = {
-  pdfTemplateEditor: 'f629d431-e71b-459b-a3da-d3a37569a165',
-} as const;
-
 export const PAGE_LAYOUT = {
   mainDashboard: '7c8ad829-008c-43f2-bec6-b35dc69823e8',
-  pdfTemplateEditor: '213073ad-bcf3-4899-a823-b65ae86cae55',
 } as const;
 
 export const NAV = {

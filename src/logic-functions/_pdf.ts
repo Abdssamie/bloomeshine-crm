@@ -2,6 +2,21 @@ import { CoreApiClient } from "twenty-client-sdk/core";
 
 import { env } from "src/logic-functions/_shared";
 
+type UploadCapableClient = CoreApiClient & {
+  uploadFile(
+    fileBuffer: Buffer,
+    filename: string,
+    contentType: string | undefined,
+    fieldMetadataUniversalIdentifier: string
+  ): Promise<{
+    id: string;
+    path: string;
+    size: number;
+    createdAt: string;
+    url: string;
+  }>;
+};
+
 export const convertHtmlToPdf = async (html: string, filename: string) => {
   const gotenbergUrl = env("GOTENBERG_URL");
   const form = new FormData();
@@ -30,4 +45,9 @@ export const uploadPdf = async (
   filename: string,
   fieldUniversalIdentifier: string
 ) =>
-  client.uploadFile(pdf, filename, "application/pdf", fieldUniversalIdentifier);
+  (client as UploadCapableClient).uploadFile(
+    pdf,
+    filename,
+    "application/pdf",
+    fieldUniversalIdentifier
+  );
