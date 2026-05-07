@@ -59,7 +59,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           GOTENBERG_API_BASIC_AUTH_USERNAME: ${{ secrets.GOTENBERG_API_BASIC_AUTH_USERNAME }}
           GOTENBERG_API_BASIC_AUTH_PASSWORD: ${{ secrets.GOTENBERG_API_BASIC_AUTH_PASSWORD }}
-          TWENTY_API_URL: ${{ secrets.TWENTY_API_URL }}
+          TWENTY_API_URL: ${{ vars.TWENTY_API_URL }}
           TWENTY_API_KEY: ${{ secrets.TWENTY_API_KEY }}
 
       - name: Deploy to Cloudflare Workers
