@@ -105,7 +105,6 @@ const pdfTemplateFields = {
   isActive: true,
   htmlSource: true,
   cssSource: true,
-  cssSource: true,
   lastPreviewedAt: true,
 } satisfies CoreSchema.PdfTemplateGenqlSelection;
 
