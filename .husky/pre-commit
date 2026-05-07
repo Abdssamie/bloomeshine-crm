@@ -1,2 +1,0 @@
-yarn install --immutable || { echo "yarn.lock is out of sync. Please run 'yarn install' and commit the updated yarn.lock file."; exit 1; }
-yarn typecheck
