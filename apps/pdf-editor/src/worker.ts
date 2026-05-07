@@ -105,12 +105,66 @@ const pdfTemplateFields = {
   isActive: true,
   htmlSource: true,
   cssSource: true,
-  previewUrl: {
-    primaryLinkLabel: true,
-    primaryLinkUrl: true,
-  },
+  cssSource: true,
   lastPreviewedAt: true,
 } satisfies CoreSchema.PdfTemplateGenqlSelection;
+
+const generatePdfResponse = async (title: string, html: string, css: string, env: Env) => {
+  if (!html.trim()) {
+    throw new Error('HTML is required.');
+  }
+
+  if (!env.GOTENBERG_URL || env.GOTENBERG_URL.includes('example.com')) {
+    throw new Error('GOTENBERG_URL is not configured.');
+  }
+
+  const form = new FormData();
+  form.append(
+    'files',
+    new File([toDocument(title, html)], 'index.html', {
+      type: 'text/html;charset=utf-8',
+    }),
+  );
+  form.append(
+    'files',
+    new File([css], 'style.css', { type: 'text/css;charset=utf-8' }),
+  );
+  form.set('marginTop', '0.45');
+  form.set('marginBottom', '0.45');
+  form.set('marginLeft', '0.45');
+  form.set('marginRight', '0.45');
+  form.set('paperWidth', '8.27');
+  form.set('paperHeight', '11.7');
+  form.set('printBackground', 'true');
+
+  const traceId = createTraceId();
+  const headers: HeadersInit = {
+    'Gotenberg-Output-Filename': 'ima-template-preview',
+    'Gotenberg-Trace': traceId,
+  };
+
+  const expectedAuthorization = getExpectedAuthorization(env);
+  if (expectedAuthorization) {
+    headers.authorization = expectedAuthorization;
+  }
+
+  const gotenbergResponse = await fetch(
+    `${env.GOTENBERG_URL.replace(/\/$/, '')}/forms/chromium/convert/html`,
+    {
+      method: 'POST',
+      headers,
+      body: form,
+    },
+  );
+
+  if (!gotenbergResponse.ok) {
+    const upstreamTrace = gotenbergResponse.headers.get('Gotenberg-Trace') ?? traceId;
+    const details = await gotenbergResponse.text();
+    throw new Error(`Gotenberg render failed (Status ${gotenbergResponse.status}). Trace: ${upstreamTrace}. Details: ${details}`);
+  }
+
+  return { gotenbergResponse, traceId };
+};
 
 const listTemplates = async (env: Env) => {
   if (!env.TWENTY_API_URL || !env.TWENTY_API_KEY) {
@@ -185,12 +239,65 @@ const saveTemplate = async (request: Request, env: Env, id: string) => {
     return json({ error: 'No template changes were provided.' }, { status: 400 });
   }
 
+  const title = typeof body.name === 'string' ? body.name : 'Template';
+  const html = typeof body.htmlSource === 'string' ? body.htmlSource : '';
+  const css = typeof body.cssSource === 'string' ? body.cssSource : '';
+
+  let previewFileId: string | undefined;
+
+  // Try to generate and upload PDF if there is HTML
+  if (html.trim()) {
+    try {
+      const { gotenbergResponse } = await generatePdfResponse(title, html, css, env);
+      const pdfBlob = await gotenbergResponse.blob();
+
+      const uploadForm = new FormData();
+      uploadForm.append('file', new File([pdfBlob], `${title || 'preview'}.pdf`, { type: 'application/pdf' }));
+
+      const fileRes = await fetch(`${env.TWENTY_API_URL.replace(/\/$/, '')}/rest/files`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${env.TWENTY_API_KEY}`,
+        },
+        body: uploadForm
+      });
+
+      if (fileRes.ok) {
+        const fileData = await fileRes.json() as { data?: { id?: string } };
+        if (fileData?.data?.id) {
+          previewFileId = fileData.data.id;
+        }
+      } else {
+        console.warn(`[DEBUG] Twenty API file upload failed: ${fileRes.status} ${await fileRes.text()}`);
+      }
+    } catch (err) {
+      console.warn('[DEBUG] Could not generate or upload PDF preview:', err);
+    }
+  }
+
   const result = await crmClient(env).mutation({
     updatePdfTemplate: {
       __args: { id, data },
       ...pdfTemplateFields,
     },
   });
+
+  // Attach the file ID to the template via REST to avoid GraphQL schema mismatch issues 
+  // if the user hasn't generated the SDK yet.
+  if (previewFileId) {
+    try {
+      await fetch(`${env.TWENTY_API_URL.replace(/\/$/, '')}/rest/pdfTemplates/${id}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${env.TWENTY_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ previewFileId })
+      });
+    } catch (err) {
+      console.warn('[DEBUG] Could not patch previewFileId:', err);
+    }
+  }
 
   return json({ template: result.updatePdfTemplate });
 };
@@ -233,83 +340,25 @@ const renderPdf = async (request: Request, env: Env) => {
   const css = typeof body.css === 'string' ? body.css : '';
   const title = typeof body.title === 'string' ? body.title : 'IMA PDF';
 
-  if (!html.trim()) {
-    return json({ error: 'HTML is required.' }, { status: 400 });
-  }
+  try {
+    const { gotenbergResponse, traceId } = await generatePdfResponse(title, html, css, env);
 
-  if (!env.GOTENBERG_URL || env.GOTENBERG_URL.includes('example.com')) {
+    return new Response(gotenbergResponse.body, {
+      headers: {
+        'content-type': 'application/pdf',
+        'content-disposition': 'inline; filename="ima-template-preview.pdf"',
+        'cache-control': 'no-store',
+        'Gotenberg-Trace': gotenbergResponse.headers.get('Gotenberg-Trace') ?? traceId,
+      },
+    });
+  } catch (error) {
     return json(
       {
-        error:
-          'GOTENBERG_URL is not configured. Set it in wrangler.jsonc or Cloudflare Worker variables.',
+        error: error instanceof Error ? error.message : 'Gotenberg render failed.',
       },
       { status: 500 },
     );
   }
-
-  const form = new FormData();
-  form.append(
-    'files',
-    new File([toDocument(title, html)], 'index.html', {
-      type: 'text/html;charset=utf-8',
-    }),
-  );
-  form.append(
-    'files',
-    new File([css], 'style.css', { type: 'text/css;charset=utf-8' }),
-  );
-  form.set('marginTop', '0.45');
-  form.set('marginBottom', '0.45');
-  form.set('marginLeft', '0.45');
-  form.set('marginRight', '0.45');
-  form.set('paperWidth', '8.27');
-  form.set('paperHeight', '11.7');
-  form.set('printBackground', 'true');
-
-  const traceId = createTraceId();
-  const headers: HeadersInit = {
-    'Gotenberg-Output-Filename': 'ima-template-preview',
-    'Gotenberg-Trace': traceId,
-  };
-
-  const expectedAuthorization = getExpectedAuthorization(env);
-
-  if (expectedAuthorization) {
-    headers.authorization = expectedAuthorization;
-  }
-
-  const gotenbergResponse = await fetch(
-    `${env.GOTENBERG_URL.replace(/\/$/, '')}/forms/chromium/convert/html`,
-    {
-      method: 'POST',
-      headers,
-      body: form,
-    },
-  );
-
-  if (!gotenbergResponse.ok) {
-    const upstreamTrace =
-      gotenbergResponse.headers.get('Gotenberg-Trace') ?? traceId;
-
-    return json(
-      {
-        error: 'Gotenberg render failed.',
-        status: gotenbergResponse.status,
-        trace: upstreamTrace,
-        details: await gotenbergResponse.text(),
-      },
-      { status: 502 },
-    );
-  }
-
-  return new Response(gotenbergResponse.body, {
-    headers: {
-      'content-type': 'application/pdf',
-      'content-disposition': 'inline; filename="ima-template-preview.pdf"',
-      'cache-control': 'no-store',
-      'Gotenberg-Trace': gotenbergResponse.headers.get('Gotenberg-Trace') ?? traceId,
-    },
-  });
 };
 
 export default {
