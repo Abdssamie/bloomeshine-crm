@@ -178,7 +178,7 @@ const listTemplates = async (env: Env) => {
         },
       },
     });
-    
+
     console.log('[DEBUG] Twenty API listTemplates raw response data:', JSON.stringify(data, null, 2));
 
     const templates =
