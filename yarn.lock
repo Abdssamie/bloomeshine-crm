@@ -3502,6 +3502,7 @@ __metadata:
     "@vitejs/plugin-react": "npm:^5.0.0"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
+    twenty-client-sdk: "npm:2.2.0"
     typescript: "npm:^6.0.3"
     vite: "npm:^7.0.0"
     wrangler: "npm:^4.14.4"
