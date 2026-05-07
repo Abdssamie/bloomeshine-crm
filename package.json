@@ -2,6 +2,10 @@
   "name": "twenty-app",
   "version": "0.1.0",
   "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
   "engines": {
     "node": "^24.5.0",
     "npm": "please-use-yarn",
@@ -13,6 +17,16 @@
     "twenty": "twenty",
     "lint": "oxlint -c .oxlintrc.json .",
     "lint:fix": "oxlint --fix -c .oxlintrc.json .",
+    "pdf:dev": "yarn workspace ima-pdf-editor dev",
+    "pdf:ui": "yarn workspace ima-pdf-editor ui:dev",
+    "pdf:build": "yarn workspace ima-pdf-editor build",
+    "pdf:deploy": "yarn workspace ima-pdf-editor deploy",
+    "pdf:preview": "yarn workspace ima-pdf-editor preview",
+    "pdf:secret:auth:username": "yarn workspace ima-pdf-editor secret:auth:username",
+    "pdf:secret:auth:password": "yarn workspace ima-pdf-editor secret:auth:password",
+    "github:sync-secrets": "node scripts/sync-github-secrets.mjs",
+    "act:pdf": "act workflow_dispatch -W .github/workflows/pdf-editor-cd.yml -P ubuntu-latest=-self-hosted --env-file .env --secret-file .env",
+    "act:cd": "act push -W .github/workflows/cd.yml -P ubuntu-latest=-self-hosted --env-file .env --secret-file .env",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"

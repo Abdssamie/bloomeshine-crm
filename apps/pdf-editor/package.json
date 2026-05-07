@@ -1,0 +1,27 @@
+{
+  "name": "ima-pdf-editor",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "yarn build && wrangler dev",
+    "ui:dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "deploy": "yarn build && wrangler deploy",
+    "preview": "yarn build && wrangler dev",
+    "secret:auth:username": "wrangler secret put GOTENBERG_API_BASIC_AUTH_USERNAME",
+    "secret:auth:password": "wrangler secret put GOTENBERG_API_BASIC_AUTH_PASSWORD"
+  },
+  "dependencies": {
+    "@tanstack/react-router": "^1.120.15",
+    "@vitejs/plugin-react": "^5.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^6.0.3",
+    "vite": "^7.0.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260507.0",
+    "wrangler": "^4.14.4"
+  }
+}

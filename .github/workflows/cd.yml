@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 env:
-  TWENTY_DEPLOY_URL: http://localhost:3000
+  TWENTY_API_URL: ${{ vars.TWENTY_API_URL }}
 
 concurrency:
   group: cd-${{ github.ref }}
@@ -32,11 +32,11 @@ jobs:
       - name: Deploy
         uses: twentyhq/twenty/.github/actions/deploy-twenty-app@main
         with:
-          api-url: ${{ env.TWENTY_DEPLOY_URL }}
-          api-key: ${{ secrets.TWENTY_DEPLOY_API_KEY }}
+          api-url: ${{ env.TWENTY_API_URL }}
+          api-key: ${{ secrets.TWENTY_API_KEY }}
 
       - name: Install
         uses: twentyhq/twenty/.github/actions/install-twenty-app@main
         with:
-          api-url: ${{ env.TWENTY_DEPLOY_URL }}
-          api-key: ${{ secrets.TWENTY_DEPLOY_API_KEY }}
+          api-url: ${{ env.TWENTY_API_URL }}
+          api-key: ${{ secrets.TWENTY_API_KEY }}

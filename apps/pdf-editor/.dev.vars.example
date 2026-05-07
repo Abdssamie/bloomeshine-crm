@@ -1,0 +1,5 @@
+GOTENBERG_URL=https://gotenberg.bloomshine.agency
+
+# Optional, only if Gotenberg API basic auth is enabled.
+# GOTENBERG_API_BASIC_AUTH_USERNAME=
+# GOTENBERG_API_BASIC_AUTH_PASSWORD=

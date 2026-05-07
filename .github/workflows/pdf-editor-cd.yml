@@ -1,0 +1,59 @@
+name: PDF Editor CD
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/pdf-editor/**'
+      - 'package.json'
+      - 'yarn.lock'
+      - '.github/workflows/pdf-editor-cd.yml'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pdf-editor-cd-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build PDF editor
+        run: yarn pdf:build
+
+      - name: Upload Gotenberg auth secrets to Cloudflare
+        run: |
+          test -n "$GOTENBERG_API_BASIC_AUTH_USERNAME"
+          test -n "$GOTENBERG_API_BASIC_AUTH_PASSWORD"
+          printf '%s' "$GOTENBERG_API_BASIC_AUTH_USERNAME" | yarn workspace ima-pdf-editor wrangler secret put GOTENBERG_API_BASIC_AUTH_USERNAME
+          printf '%s' "$GOTENBERG_API_BASIC_AUTH_PASSWORD" | yarn workspace ima-pdf-editor wrangler secret put GOTENBERG_API_BASIC_AUTH_PASSWORD
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          GOTENBERG_API_BASIC_AUTH_USERNAME: ${{ secrets.GOTENBERG_API_BASIC_AUTH_USERNAME }}
+          GOTENBERG_API_BASIC_AUTH_PASSWORD: ${{ secrets.GOTENBERG_API_BASIC_AUTH_PASSWORD }}
+
+      - name: Deploy to Cloudflare Workers
+        run: yarn workspace ima-pdf-editor wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
