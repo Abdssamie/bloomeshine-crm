@@ -39,11 +39,8 @@ jobs:
 
       - name: Build PDF editor
         run: |
-          yarn twenty dev --once
+          yarn twenty build
           yarn pdf:build
-        env:
-          TWENTY_API_URL: ${{ vars.TWENTY_API_URL }}
-          TWENTY_API_KEY: ${{ secrets.TWENTY_API_KEY }}
 
       - name: Upload secrets to Cloudflare
         run: |
