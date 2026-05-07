@@ -1,0 +1,15 @@
+#!/bin/sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+
+if [ "$current_branch" = "main" ]; then
+  LOCAL_VERSION=$(grep -m1 '"version":' package.json | awk -F\" '{print $4}')
+  REMOTE_VERSION=$(git show origin/main:package.json 2>/dev/null | grep -m1 '"version":' | awk -F\" '{print $4}')
+
+  if [ -n "$REMOTE_VERSION" ] && [ "$LOCAL_VERSION" = "$REMOTE_VERSION" ]; then
+    echo "❌ Error: You must bump the version in package.json (currently $LOCAL_VERSION) before pushing to main."
+    echo "The Twenty deployment action will fail if the version is not higher than the currently deployed version."
+    exit 1
+  fi
+fi
