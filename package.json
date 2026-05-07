@@ -1,6 +1,6 @@
 {
   "name": "twenty-app",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "license": "MIT",
   "private": true,
   "workspaces": [
@@ -30,7 +30,8 @@
     "twenty:typecheck": "yarn twenty typecheck",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepare": "husky"
   },
   "dependencies": {
     "twenty-client-sdk": "2.2.0",
@@ -40,6 +41,7 @@
     "@types/node": "^24.7.2",
     "@types/react": "^19.0.0",
     "@typescript/native-preview": "7.0.0-dev.20260505.1",
+    "husky": "^9.1.7",
     "oxlint": "^0.16.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

@@ -42,14 +42,18 @@ jobs:
 
       - name: Upload secrets to Cloudflare
         run: |
-          test -n "$GOTENBERG_API_BASIC_AUTH_USERNAME"
-          test -n "$GOTENBERG_API_BASIC_AUTH_PASSWORD"
-          test -n "$TWENTY_API_URL"
-          test -n "$TWENTY_API_KEY"
-          printf '%s' "$GOTENBERG_API_BASIC_AUTH_USERNAME" | yarn workspace ima-pdf-editor wrangler secret put GOTENBERG_API_BASIC_AUTH_USERNAME
-          printf '%s' "$GOTENBERG_API_BASIC_AUTH_PASSWORD" | yarn workspace ima-pdf-editor wrangler secret put GOTENBERG_API_BASIC_AUTH_PASSWORD
-          printf '%s' "$TWENTY_API_URL" | yarn workspace ima-pdf-editor wrangler secret put TWENTY_API_URL
-          printf '%s' "$TWENTY_API_KEY" | yarn workspace ima-pdf-editor wrangler secret put TWENTY_API_KEY
+          if [ -n "$GOTENBERG_API_BASIC_AUTH_USERNAME" ]; then
+            printf '%s' "$GOTENBERG_API_BASIC_AUTH_USERNAME" | yarn workspace ima-pdf-editor wrangler secret put GOTENBERG_API_BASIC_AUTH_USERNAME
+          fi
+          if [ -n "$GOTENBERG_API_BASIC_AUTH_PASSWORD" ]; then
+            printf '%s' "$GOTENBERG_API_BASIC_AUTH_PASSWORD" | yarn workspace ima-pdf-editor wrangler secret put GOTENBERG_API_BASIC_AUTH_PASSWORD
+          fi
+          if [ -n "$TWENTY_API_URL" ]; then
+            printf '%s' "$TWENTY_API_URL" | yarn workspace ima-pdf-editor wrangler secret put TWENTY_API_URL
+          fi
+          if [ -n "$TWENTY_API_KEY" ]; then
+            printf '%s' "$TWENTY_API_KEY" | yarn workspace ima-pdf-editor wrangler secret put TWENTY_API_KEY
+          fi
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
