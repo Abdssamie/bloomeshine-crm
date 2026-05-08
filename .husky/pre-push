@@ -1,0 +1,24 @@
+#!/usr/bin/env sh
+
+changed_files="$(git diff --name-only HEAD @{upstream}...HEAD 2>/dev/null || git diff --name-only HEAD~1...HEAD 2>/dev/null || true)"
+
+twenty_source_changed="$(printf '%s\n' "$changed_files" | grep -E '^(src/|tsconfig\.json$|tsconfig\.spec\.json$|vitest\.config\.ts$)' || true)"
+
+if [ -z "$twenty_source_changed" ]; then
+  exit 0
+fi
+
+package_json_changed="$(printf '%s\n' "$changed_files" | grep -x 'package.json' || true)"
+
+if [ -z "$package_json_changed" ]; then
+  printf '%s\n' 'Twenty app source changed, but package.json was not changed. Bump the root package version before pushing.' >&2
+  exit 1
+fi
+
+current_version="$(sed -n 's/^[[:space:]]*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' package.json | head -n 1)"
+base_version="$(git show @{upstream}:package.json 2>/dev/null | sed -n 's/^[[:space:]]*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -n 1)"
+
+if [ -n "$base_version" ] && [ "$current_version" = "$base_version" ]; then
+  printf 'Twenty app source changed, but root package.json version is still %s. Bump it before pushing.\n' "$current_version" >&2
+  exit 1
+fi

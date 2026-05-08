@@ -17,7 +17,6 @@
     "@vitejs/plugin-react": "^5.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "twenty-client-sdk": "2.2.0",
     "typescript": "^6.0.3",
     "vite": "^7.0.0"
   },

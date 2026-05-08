@@ -48,5 +48,13 @@ export default defineObject({
       targetObject: OBJECT.deal,
       targetField: fieldId(OBJECT.deal, 'campaign'),
     }),
+    oneToMany({
+      universalIdentifier: fieldId(OBJECT.campaign, 'tasks'),
+      name: 'tasks',
+      label: 'Tasks',
+      icon: 'IconCheckbox',
+      targetObject: OBJECT.crmTask,
+      targetField: fieldId(OBJECT.crmTask, 'campaign'),
+    }),
   ],
 });

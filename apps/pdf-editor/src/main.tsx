@@ -8,7 +8,6 @@ import {
   createRootRoute,
   createRoute,
   createRouter,
-  useParams
 } from '@tanstack/react-router';
 
 import './styles/app.css';
@@ -112,15 +111,6 @@ const placeholders = [
   '{{text.deliverables}}',
   '{{text.usageRights}}',
 ];
-
-type PdfTemplate = {
-  id: string;
-  name?: string | null;
-  kind?: 'INVOICE' | 'CONTRACT' | null;
-  isActive?: boolean | null;
-  htmlSource?: string | null;
-  cssSource?: string | null;
-};
 
 const escapeSource = (value: string) =>
   value
@@ -227,143 +217,27 @@ const Root = () => (
   </>
 );
 
-const TemplatesPage = () => {
-  const [templates, setTemplates] = React.useState<PdfTemplate[]>([]);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
-
-  React.useEffect(() => {
-    fetch('/api/templates')
-      .then((res) => res.json() as Promise<{ templates?: PdfTemplate[]; error?: string }>)
-      .then((payload) => {
-        if (payload.error) throw new Error(payload.error);
-        setTemplates(payload.templates ?? []);
-      })
-      .catch((e) => setError(e.message))
-      .finally(() => setIsLoading(false));
-  }, []);
-
-  return (
-    <main className="app-shell help-page">
-      <header className="topbar">
-        <div>
-          <p className="kicker">CRM PDF Templates</p>
-          <h1>Select a Template</h1>
-        </div>
-        <Link to="/help" className="secondary-button">
-          Help
-        </Link>
-      </header>
-      {error && <div className="error-banner" style={{marginTop: 16}}>{error}</div>}
-      {isLoading ? (
-        <p style={{marginTop: 16}}>Loading templates...</p>
-      ) : (
-        <div className="template-list" style={{ marginTop: 24, display: 'grid', gap: 16, gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
-          {templates.map(t => (
-            <Link key={t.id} to="/editor/$templateId" params={{ templateId: t.id }} style={{ textDecoration: 'none' }}>
-              <div className="setup-grid article" style={{ background: '#fffaf1', border: '1px solid #d5cbbb', borderRadius: 8, padding: 16, color: '#3a352d', height: '100%' }}>
-                <h3 style={{ margin: '0 0 8px', fontSize: 18 }}>{t.name || 'Unnamed Template'}</h3>
-                <p style={{ margin: 0, fontSize: 13, color: '#6f675a' }}>
-                  {t.kind} {t.isActive ? '• Active' : ''}
-                </p>
-              </div>
-            </Link>
-          ))}
-          {templates.length === 0 && <p>No templates found.</p>}
-        </div>
-      )}
-    </main>
-  );
-};
-
 const EditorPage = () => {
-  const { templateId } = useParams({ strict: false });
   const [title, setTitle] = React.useState('Default Contract');
   const [kind, setKind] = React.useState<'INVOICE' | 'CONTRACT'>('CONTRACT');
-  const [isActive, setIsActive] = React.useState(false);
   const [html, setHtml] = React.useState(defaultHtml);
   const [css, setCss] = React.useState(defaultCss);
   const [activeEditorTab, setActiveEditorTab] = React.useState<'html' | 'css'>('html');
   const [pdfUrl, setPdfUrl] = useStateWithCleanup<string | null>(null);
-  const [isLoadingTemplate, setIsLoadingTemplate] = useStoredFlag(false);
-  const [isSaving, setIsSaving] = useStoredFlag(false);
-  const [isDirty, setIsDirty] = React.useState(false);
   const [isRendering, setIsRendering] = useStoredFlag(false);
   const [error, setError] = useStoredFlag<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
 
-  const applyTemplate = React.useCallback(
-    (template: PdfTemplate) => {
-      setTitle(template.name ?? '');
-      setKind(template.kind === 'INVOICE' ? 'INVOICE' : 'CONTRACT');
-      setIsActive(Boolean(template.isActive));
-      setHtml(template.htmlSource ?? defaultHtml);
-      setCss(template.cssSource ?? defaultCss);
-      setIsDirty(false);
-      setPdfUrl(null);
-    },
-    [setPdfUrl],
-  );
-
-  const loadTemplate = async (id: string) => {
-    if (!id) return;
-    setIsLoadingTemplate(true);
-    setError(null);
-    try {
-      const response = await fetch(`/api/templates/${encodeURIComponent(id)}`);
-      const payload = (await response.json()) as { template?: PdfTemplate; error?: string };
-      if (!response.ok || !payload.template) {
-        throw new Error(payload.error ?? 'Failed to load PDF template.');
-      }
-      applyTemplate(payload.template);
-    } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : 'Failed to load.');
-    } finally {
-      setIsLoadingTemplate(false);
-    }
-  };
-
-  React.useEffect(() => {
-    if (templateId) {
-      loadTemplate(templateId as string);
-    }
-  }, [templateId]);
-
   const updateTitle = (value: string) => {
     setTitle(value);
-    setIsDirty(true);
   };
 
   const updateHtml = (value: string) => {
     setHtml(value);
-    setIsDirty(true);
   };
 
   const updateCss = (value: string) => {
     setCss(value);
-    setIsDirty(true);
-  };
-
-  const save = async () => {
-    if (!templateId) return;
-    setIsSaving(true);
-    setError(null);
-    try {
-      const response = await fetch(`/api/templates/${encodeURIComponent(templateId as string)}`, {
-        method: 'PUT',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ name: title, kind, isActive, htmlSource: html, cssSource: css }),
-      });
-      const payload = (await response.json()) as { template?: PdfTemplate; error?: string };
-      if (!response.ok || !payload.template) {
-        throw new Error(payload.error ?? 'Failed to save PDF template.');
-      }
-      applyTemplate(payload.template);
-    } catch (saveError) {
-      setError(saveError instanceof Error ? saveError.message : 'Failed to save.');
-    } finally {
-      setIsSaving(false);
-    }
   };
 
   const render = async () => {
@@ -396,9 +270,7 @@ const EditorPage = () => {
       {error ? <div className="error-banner">{error}</div> : null}
 
       <header className="editor-topbar">
-        <Link to="/" className="back-link">
-          &larr; Back
-        </Link>
+        <p className="kicker">PDF Template Playground</p>
         
         <input
           className="title-input"
@@ -412,30 +284,14 @@ const EditorPage = () => {
           value={kind}
           onChange={(event) => {
             setKind(event.target.value === 'INVOICE' ? 'INVOICE' : 'CONTRACT');
-            setIsDirty(true);
           }}
         >
           <option value="INVOICE">Invoice</option>
           <option value="CONTRACT">Contract</option>
         </select>
 
-        <label className="minimal-check">
-          <input
-            type="checkbox"
-            checked={isActive}
-            onChange={(event) => {
-              setIsActive(event.target.checked);
-              setIsDirty(true);
-            }}
-          />
-          <span>Active</span>
-        </label>
-
         <div className="spacer" />
 
-        <button type="button" onClick={save} disabled={!templateId || isSaving || isLoadingTemplate || !isDirty} className="primary-button">
-          {isSaving ? 'Saving...' : 'Save to CRM'}
-        </button>
         <button type="button" onClick={render} disabled={isRendering} className="primary-button">
           {isRendering ? 'Rendering...' : 'Render PDF'}
         </button>
@@ -547,11 +403,6 @@ const rootRoute = createRootRoute({ component: Root });
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
-  component: TemplatesPage,
-});
-const editorRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/editor/$templateId',
   component: EditorPage,
 });
 const helpRoute = createRoute({
@@ -561,29 +412,13 @@ const helpRoute = createRoute({
 });
 
 const router = createRouter({
-  routeTree: rootRoute.addChildren([indexRoute, editorRoute, helpRoute]),
+  routeTree: rootRoute.addChildren([indexRoute, helpRoute]),
 });
 
 declare module '@tanstack/react-router' {
   interface Register {
     router: typeof router;
   }
-}
-
-function useStoredState(key: string, initialValue: string) {
-  const [value, setValue] = React.useState(() => {
-    if (typeof localStorage === 'undefined') {
-      return initialValue;
-    }
-
-    return localStorage.getItem(key) ?? initialValue;
-  });
-
-  React.useEffect(() => {
-    localStorage.setItem(key, value);
-  }, [key, value]);
-
-  return [value, setValue] as const;
 }
 
 function useStoredFlag<T>(initialValue: T) {

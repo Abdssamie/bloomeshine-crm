@@ -9,8 +9,14 @@ export const OBJECT = {
   creator: '147481c1-48df-4cff-9795-c9c79493fe05',
   campaign: '0e8be7e4-cc51-414e-9fa4-b30a1d98ae96',
   deal: 'f2ec60cd-1e06-4a06-b31c-d7432c2adb67',
+  crmTask: '99dc098d-ff05-4244-a5b3-e2f848daed4b',
   contract: '10e06bad-681e-4304-bd40-561c1175447c',
   pdfTemplate: '744f02b9-b704-439d-89aa-52e7f21aebda',
+} as const;
+
+export const FIELD = {
+  crmTaskAssignee: '3ec79494-2df1-43f3-9fd8-01dd1b94d555',
+  workspaceMemberAssignedCrmTasks: '1625908e-99a7-4f8d-8e44-425cb55cb1ae',
 } as const;
 
 export const VIEW = {
@@ -18,6 +24,7 @@ export const VIEW = {
   creators: 'ad2b7f64-aab0-4b23-ad14-c590c8c66cc8',
   campaigns: '83920b6c-59cb-464a-bd6e-0e830e87e34a',
   deals: '0f5c0cb6-e0c4-4a8c-b5de-1b34f980ea2e',
+  tasksKanban: '70821d02-e21b-4368-9715-92386bafbb75',
   contracts: 'afc2394c-648e-4937-99d5-c15a3f56f311',
   pdfTemplates: '943cce61-7132-4613-afaa-6384e5e954f2',
 } as const;
@@ -32,6 +39,7 @@ export const NAV = {
   creators: '571166ae-2080-43f4-99d5-659b0ea5cc05',
   campaigns: '0ad00740-2fdd-41c5-b18b-212c647f10ff',
   deals: '3ed149e0-7e61-468e-a830-d934d383f310',
+  tasksKanban: '4abec859-603d-437f-a548-93393fba6db6',
   contracts: 'f12d06c0-98a0-4f68-8b04-de2d9361087c',
   pdfTemplates: 'fac0c9c7-9074-4866-bad7-a4b4de324d94',
 } as const;

@@ -72,6 +72,7 @@ export default defineObject({
     { universalIdentifier: fieldId(OBJECT.deal, 'revisionPolicy'), type: FieldType.RICH_TEXT, name: 'revisionPolicy', label: 'Revisions', icon: 'IconRepeat', isNullable: true },
     manyToOne({ universalIdentifier: fieldId(OBJECT.deal, 'campaign'), name: 'campaign', label: 'Campaign', icon: 'IconTargetArrow', targetObject: OBJECT.campaign, targetField: fieldId(OBJECT.campaign, 'deals') }),
     manyToOne({ universalIdentifier: fieldId(OBJECT.deal, 'creator'), name: 'creator', label: 'Creator', icon: 'IconUserStar', targetObject: OBJECT.creator, targetField: fieldId(OBJECT.creator, 'deals') }),
+    oneToMany({ universalIdentifier: fieldId(OBJECT.deal, 'tasks'), name: 'tasks', label: 'Tasks', icon: 'IconCheckbox', targetObject: OBJECT.crmTask, targetField: fieldId(OBJECT.crmTask, 'deal') }),
     oneToMany({ universalIdentifier: fieldId(OBJECT.deal, 'contracts'), name: 'contracts', label: 'Contracts', icon: 'IconFileCertificate', targetObject: OBJECT.contract, targetField: fieldId(OBJECT.contract, 'deal') }),
   ],
 });
