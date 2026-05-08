@@ -11,5 +11,5 @@ export default defineNavigationMenuItem({
   name: "PDF Templates",
   icon: "IconFileTypePdf",
   viewUniversalIdentifier: VIEW.pdfTemplates,
-  position: 50,
+  position: 60,
 });

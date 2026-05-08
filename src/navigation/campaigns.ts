@@ -9,5 +9,5 @@ export default defineNavigationMenuItem({
   type: NavigationMenuItemType.VIEW,
   name: "Campaigns",
   viewUniversalIdentifier: VIEW.campaigns,
-  position: 30,
+  position: 40,
 });

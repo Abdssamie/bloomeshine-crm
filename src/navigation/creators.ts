@@ -9,5 +9,5 @@ export default defineNavigationMenuItem({
   type: NavigationMenuItemType.VIEW,
   name: "Creators",
   viewUniversalIdentifier: VIEW.creators,
-  position: 20,
+  position: 30,
 });
