@@ -9,5 +9,5 @@ export default defineNavigationMenuItem({
   type: NavigationMenuItemType.VIEW,
   name: "Deals",
   viewUniversalIdentifier: VIEW.deals,
-  position: 90,
+  position: 40,
 });
