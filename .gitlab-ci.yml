@@ -1,0 +1,30 @@
+image: node:20
+
+stages:
+  - test
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+install-deps:
+  stage: .pre
+  script:
+    - corepack enable
+    - yarn install --immutable
+  cache:
+    key: yarn-${CI_COMMIT_SHORT_SHA}
+    paths:
+      - .yarn
+      - node_modules
+  artifacts:
+    paths:
+      - node_modules/
+      - .yarn/
+    expire_in: 1 hour
+
+test:
+  stage: test
+  needs: [install-deps]
+  script:
+    - yarn test
+  allow_failure: false
