@@ -71,9 +71,7 @@ deploy_app:
     - yarn twenty deploy -r gitlab-ci
     - yarn twenty install -r gitlab-ci
   rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: manual
+    - when: manual
       allow_failure: true
 
 deploy_pdf_editor:
@@ -96,10 +94,5 @@ deploy_pdf_editor:
       fi
     - yarn workspace ima-pdf-editor wrangler deploy
   rules:
-    - if: $CI_PIPELINE_SOURCE == "web"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      changes:
-        - apps/pdf-editor/**/*
-        - package.json
-        - yarn.lock
-        - .gitlab-ci.yml
+    - when: manual
+      allow_failure: true
