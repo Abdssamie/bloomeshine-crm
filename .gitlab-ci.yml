@@ -27,6 +27,19 @@ workflow:
 
 test:
   stage: test
+  services:
+    - name: docker:27-dind
+      command:
+        - --tls=false
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  before_script:
+    - apt-get update
+    - apt-get install -y docker.io
+    - mkdir -p "$YARN_CACHE_FOLDER" "$COREPACK_HOME"
+    - corepack enable
+    - yarn install --immutable
   script:
     - yarn twenty server start >/tmp/twenty-server.log 2>&1 &
     - |
@@ -54,7 +67,7 @@ test:
   after_script:
     - |
       if [ "$CI_JOB_STATUS" != "success" ]; then
-        cat /tmp/twenty-server.log
+        test -f /tmp/twenty-server.log && cat /tmp/twenty-server.log
       fi
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
