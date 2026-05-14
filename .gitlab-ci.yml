@@ -3,7 +3,6 @@ stages:
   - deploy
 
 variables:
-  HOME: $CI_PROJECT_DIR/.home
   YARN_CACHE_FOLDER: $CI_PROJECT_DIR/.yarn/cache
   COREPACK_HOME: $CI_PROJECT_DIR/.cache/Corepack
 
@@ -17,7 +16,7 @@ default:
       - .yarn/cache/
       - .cache/Corepack/
   before_script:
-    - mkdir -p "$HOME" "$YARN_CACHE_FOLDER" "$COREPACK_HOME"
+    - mkdir -p "$YARN_CACHE_FOLDER" "$COREPACK_HOME"
     - corepack enable
     - yarn install --immutable
 
