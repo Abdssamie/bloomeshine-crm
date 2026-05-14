@@ -2,7 +2,17 @@
 
 changed_files="$(git diff --name-only HEAD @{upstream}...HEAD 2>/dev/null || git diff --name-only HEAD~1...HEAD 2>/dev/null || true)"
 
+package_manager_changed="$(printf '%s\n' "$changed_files" | grep -E '^(package\.json|yarn\.lock|\.yarnrc\.yml|apps/[^/]+/package\.json)$' || true)"
 twenty_source_changed="$(printf '%s\n' "$changed_files" | grep -E '^(src/|tsconfig\.json$|tsconfig\.spec\.json$|vitest\.config\.ts$)' || true)"
+
+if [ -n "$package_manager_changed" ]; then
+  printf '%s\n' 'Package manager files changed. Running yarn install --immutable before push...' >&2
+
+  if ! yarn install --immutable; then
+    printf '%s\n' 'Immutable Yarn install failed. Refresh the lockfile and commit the result before pushing.' >&2
+    exit 1
+  fi
+fi
 
 if [ -z "$twenty_source_changed" ]; then
   exit 0
