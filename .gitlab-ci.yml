@@ -1,30 +1,101 @@
-image: node:20
-
 stages:
   - test
+  - deploy
 
-variables:
-  GIT_SUBMODULE_STRATEGY: recursive
-
-install-deps:
-  stage: .pre
-  script:
+default:
+  image: node:24.5.0-bookworm
+  cache:
+    key:
+      files:
+        - yarn.lock
+    paths:
+      - .yarn/cache/
+      - .cache/Corepack/
+  variables:
+    HOME: $CI_PROJECT_DIR/.home
+    YARN_CACHE_FOLDER: $CI_PROJECT_DIR/.yarn/cache
+    COREPACK_HOME: $CI_PROJECT_DIR/.cache/Corepack
+  before_script:
+    - mkdir -p "$HOME" "$YARN_CACHE_FOLDER" "$COREPACK_HOME"
     - corepack enable
     - yarn install --immutable
-  cache:
-    key: yarn-${CI_COMMIT_SHORT_SHA}
-    paths:
-      - .yarn
-      - node_modules
-  artifacts:
-    paths:
-      - node_modules/
-      - .yarn/
-    expire_in: 1 hour
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
 
 test:
   stage: test
-  needs: [install-deps]
   script:
+    - yarn twenty server start >/tmp/twenty-server.log 2>&1 &
+    - |
+      node <<'EOF'
+      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+      const waitForHealthz = async () => {
+        for (let attempt = 0; attempt < 60; attempt += 1) {
+          try {
+            const response = await fetch('http://127.0.0.1:2020/healthz');
+            if (response.ok) {
+              process.exit(0);
+            }
+          } catch {}
+
+          await delay(2000);
+        }
+
+        process.exit(1);
+      };
+
+      await waitForHealthz();
+      EOF
     - yarn test
-  allow_failure: false
+  after_script:
+    - |
+      if [ "$CI_JOB_STATUS" != "success" ]; then
+        cat /tmp/twenty-server.log
+      fi
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+deploy_app:
+  stage: deploy
+  script:
+    - yarn twenty remote add --as gitlab-ci --api-url "$TWENTY_API_URL" --api-key "$TWENTY_API_KEY"
+    - yarn twenty deploy -r gitlab-ci
+    - yarn twenty install -r gitlab-ci
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: manual
+      allow_failure: true
+
+deploy_pdf_editor:
+  stage: deploy
+  script:
+    - yarn twenty build
+    - yarn pdf:build
+    - |
+      if [ -n "${GOTENBERG_API_BASIC_AUTH_USERNAME:-}" ]; then
+        printf '%s' "$GOTENBERG_API_BASIC_AUTH_USERNAME" | yarn workspace ima-pdf-editor wrangler secret put GOTENBERG_API_BASIC_AUTH_USERNAME
+      fi
+      if [ -n "${GOTENBERG_API_BASIC_AUTH_PASSWORD:-}" ]; then
+        printf '%s' "$GOTENBERG_API_BASIC_AUTH_PASSWORD" | yarn workspace ima-pdf-editor wrangler secret put GOTENBERG_API_BASIC_AUTH_PASSWORD
+      fi
+      if [ -n "${TWENTY_API_URL:-}" ]; then
+        printf '%s' "$TWENTY_API_URL" | yarn workspace ima-pdf-editor wrangler secret put TWENTY_API_URL
+      fi
+      if [ -n "${TWENTY_API_KEY:-}" ]; then
+        printf '%s' "$TWENTY_API_KEY" | yarn workspace ima-pdf-editor wrangler secret put TWENTY_API_KEY
+      fi
+    - yarn workspace ima-pdf-editor wrangler deploy
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - apps/pdf-editor/**/*
+        - package.json
+        - yarn.lock
+        - .gitlab-ci.yml

@@ -1,7 +1,7 @@
 import { FieldType, defineObject } from 'twenty-sdk/define';
 
 import { OBJECT } from 'src/constants/universal-identifiers';
-import { fieldId, oneToMany, select } from 'src/objects/_helpers';
+import { fieldId, manyToOne, oneToMany, select } from 'src/objects/_helpers';
 
 export default defineObject({
   universalIdentifier: OBJECT.brand,
@@ -45,6 +45,14 @@ export default defineObject({
       options: select(['Not-Contacted', 'Contacted', 'Replied', 'Not-Interested', 'Bounced']),
     },
     { universalIdentifier: fieldId(OBJECT.brand, 'lastInteractionAt'), type: FieldType.DATE_TIME, name: 'lastInteractionAt', label: 'Last Touch', icon: 'IconClock', isNullable: true },
+    manyToOne({
+      universalIdentifier: fieldId(OBJECT.brand, 'emailTemplate'),
+      name: 'emailTemplate',
+      label: 'Email Template',
+      icon: 'IconMail',
+      targetObject: OBJECT.emailTemplate,
+      targetField: fieldId(OBJECT.emailTemplate, 'brands'),
+    }),
     { universalIdentifier: fieldId(OBJECT.brand, 'notes'), type: FieldType.RICH_TEXT, name: 'notes', label: 'Notes', icon: 'IconNotes', isNullable: true },
     oneToMany({
       universalIdentifier: fieldId(OBJECT.brand, 'campaigns'),

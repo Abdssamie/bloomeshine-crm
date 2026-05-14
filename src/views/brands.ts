@@ -21,5 +21,6 @@ export default defineView({
     { universalIdentifier: generateDefaultFieldUniversalIdentifier({ objectUniversalIdentifier: VIEW.brands, fieldName: 'subNiche' }), fieldMetadataUniversalIdentifier: generateDefaultFieldUniversalIdentifier({ objectUniversalIdentifier: OBJECT.brand, fieldName: 'subNiche' }), position: 8, isVisible: true },
     { universalIdentifier: generateDefaultFieldUniversalIdentifier({ objectUniversalIdentifier: VIEW.brands, fieldName: 'region' }), fieldMetadataUniversalIdentifier: generateDefaultFieldUniversalIdentifier({ objectUniversalIdentifier: OBJECT.brand, fieldName: 'region' }), position: 9, isVisible: true },
     { universalIdentifier: generateDefaultFieldUniversalIdentifier({ objectUniversalIdentifier: VIEW.brands, fieldName: 'lastInteractionAt' }), fieldMetadataUniversalIdentifier: generateDefaultFieldUniversalIdentifier({ objectUniversalIdentifier: OBJECT.brand, fieldName: 'lastInteractionAt' }), position: 10, isVisible: true },
+    { universalIdentifier: generateDefaultFieldUniversalIdentifier({ objectUniversalIdentifier: VIEW.brands, fieldName: 'emailTemplate' }), fieldMetadataUniversalIdentifier: generateDefaultFieldUniversalIdentifier({ objectUniversalIdentifier: OBJECT.brand, fieldName: 'emailTemplate' }), position: 11, isVisible: true },
   ],
 });

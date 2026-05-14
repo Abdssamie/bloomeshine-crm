@@ -132,5 +132,16 @@ export default defineView({
       position: 9,
       isVisible: true,
     },
+    {
+      universalIdentifier: generateDefaultFieldUniversalIdentifier({
+        objectUniversalIdentifier: VIEW.creators,
+        fieldName: "emailTemplate",
+      }),
+      fieldMetadataUniversalIdentifier: generateDefaultFieldUniversalIdentifier(
+        { objectUniversalIdentifier: OBJECT.creator, fieldName: "emailTemplate" }
+      ),
+      position: 10,
+      isVisible: true,
+    },
   ],
 });

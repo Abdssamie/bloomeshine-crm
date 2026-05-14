@@ -12,6 +12,7 @@ export const OBJECT = {
   crmTask: '99dc098d-ff05-4244-a5b3-e2f848daed4b',
   contract: '10e06bad-681e-4304-bd40-561c1175447c',
   pdfTemplate: '744f02b9-b704-439d-89aa-52e7f21aebda',
+  emailTemplate: 'e1dc5ecd-1e73-4ea2-82da-72d3d2fc974c',
 } as const;
 
 export const FIELD = {
@@ -27,6 +28,7 @@ export const VIEW = {
   tasksKanban: '70821d02-e21b-4368-9715-92386bafbb75',
   contracts: 'afc2394c-648e-4937-99d5-c15a3f56f311',
   pdfTemplates: '943cce61-7132-4613-afaa-6384e5e954f2',
+  emailTemplates: '30b02fa1-abe5-4eee-86d7-7bb15786ca03',
 } as const;
 
 export const PAGE_LAYOUT = {
@@ -42,6 +44,7 @@ export const NAV = {
   tasksKanban: '4abec859-603d-437f-a548-93393fba6db6',
   contracts: 'f12d06c0-98a0-4f68-8b04-de2d9361087c',
   pdfTemplates: 'fac0c9c7-9074-4866-bad7-a4b4de324d94',
+  emailTemplates: '6b806694-d569-4939-a835-b8331929134d',
 } as const;
 
 export const LOGIC_FUNCTION = {

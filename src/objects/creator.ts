@@ -1,7 +1,7 @@
 import { FieldType, NumberDataType, defineObject } from 'twenty-sdk/define';
 
 import { OBJECT } from 'src/constants/universal-identifiers';
-import { fieldId, oneToMany, select } from 'src/objects/_helpers';
+import { fieldId, manyToOne, oneToMany, select } from 'src/objects/_helpers';
 
 const number = (name: string, label: string, icon: string) => ({
   universalIdentifier: fieldId(OBJECT.creator, name),
@@ -59,6 +59,14 @@ export default defineObject({
       defaultValue: "'COLLECTED'",
       options: select(['Collected', 'Vetted', 'Contacted', 'Replied', 'Onboarded', 'Blacklisted']),
     },
+    manyToOne({
+      universalIdentifier: fieldId(OBJECT.creator, 'emailTemplate'),
+      name: 'emailTemplate',
+      label: 'Email Template',
+      icon: 'IconMail',
+      targetObject: OBJECT.emailTemplate,
+      targetField: fieldId(OBJECT.emailTemplate, 'creators'),
+    }),
     oneToMany({
       universalIdentifier: fieldId(OBJECT.creator, 'deals'),
       name: 'deals',
