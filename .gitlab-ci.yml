@@ -30,8 +30,12 @@ test:
   services:
     - name: twentycrm/twenty-app-dev:latest
       alias: twenty
+      variables:
+        NODE_ENV: development
+        NODE_PORT: "2021"
+        SERVER_URL: http://twenty:2021
   variables:
-    TWENTY_API_URL: http://twenty:2020
+    TWENTY_API_URL: http://twenty:2021
     TWENTY_API_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMDIwMjAyMC0xYzI1LTRkMDItYmYyNS02YWVjY2Y3ZWE0MTkiLCJ0eXBlIjoiQVBJX0tFWSIsIndvcmtzcGFjZUlkIjoiMjAyMDIwMjAtMWMyNS00ZDAyLWJmMjUtNmFlY2NmN2VhNDE5IiwiaWF0IjoxNzM1Njg5NjAwLCJleHAiOjQ4OTE0NDk2MDAsImp0aSI6IjIwMjAyMDIwLWY0MDEtNGQ4YS1hNzMxLTY0ZDAwN2MyN2JhZCJ9.bfQjfyN0NEtTCLE_xPyNcwonDzlSXFoP8kdCQTdnuDc
   script:
     - |
@@ -41,7 +45,7 @@ test:
       const waitForHealthz = async () => {
         for (let attempt = 0; attempt < 180; attempt += 1) {
           try {
-            const response = await fetch('http://twenty:2020/healthz');
+            const response = await fetch('http://twenty:2021/healthz');
             if (response.ok) {
               process.exit(0);
             }
