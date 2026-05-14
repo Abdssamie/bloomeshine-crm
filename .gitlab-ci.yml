@@ -2,6 +2,11 @@ stages:
   - test
   - deploy
 
+variables:
+  HOME: $CI_PROJECT_DIR/.home
+  YARN_CACHE_FOLDER: $CI_PROJECT_DIR/.yarn/cache
+  COREPACK_HOME: $CI_PROJECT_DIR/.cache/Corepack
+
 default:
   image: node:24.5.0-bookworm
   cache:
@@ -11,10 +16,6 @@ default:
     paths:
       - .yarn/cache/
       - .cache/Corepack/
-  variables:
-    HOME: $CI_PROJECT_DIR/.home
-    YARN_CACHE_FOLDER: $CI_PROJECT_DIR/.yarn/cache
-    COREPACK_HOME: $CI_PROJECT_DIR/.cache/Corepack
   before_script:
     - mkdir -p "$HOME" "$YARN_CACHE_FOLDER" "$COREPACK_HOME"
     - corepack enable
